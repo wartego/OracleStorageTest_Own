@@ -5,8 +5,10 @@ import com.oracle.bmc.auth.AuthenticationDetailsProvider;
 import com.oracle.bmc.auth.ConfigFileAuthenticationDetailsProvider;
 import com.oracle.bmc.objectstorage.ObjectStorageClient;
 import com.oracle.bmc.objectstorage.model.ObjectSummary;
+import com.oracle.bmc.objectstorage.requests.CreateBucketRequest;
 import com.oracle.bmc.objectstorage.requests.GetObjectRequest;
 import com.oracle.bmc.objectstorage.requests.ListObjectsRequest;
+import com.oracle.bmc.objectstorage.requests.PutObjectRequest;
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
 import com.oracle.bmc.objectstorage.responses.ListObjectsResponse;
 
@@ -77,7 +79,7 @@ public class OracleGetFIles {
 
             GetObjectResponse response = client.getObject(getObjectRequest);
             File existFile = new File("C:\\OracleBucketFilesTest\\" + s.getName());
-            System.out.println("Oracle size: "+ s.getSize() + " current disk size: " + existFile.length());
+            //System.out.println("Oracle size: "+ s.getSize() + " current disk size: " + existFile.length());
 
             boolean exist;
             if(exist = (!existFile.exists() || (existFile.exists() && existFile.length() != s.getSize()))){
@@ -96,6 +98,11 @@ public class OracleGetFIles {
 
         });
 
+
+    }
+    public static void saveFilesOnOCI(){
+
+        PutObjectRequest 
 
     }
 
