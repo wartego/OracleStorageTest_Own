@@ -11,10 +11,13 @@ import com.oracle.bmc.objectstorage.requests.ListObjectsRequest;
 import com.oracle.bmc.objectstorage.requests.PutObjectRequest;
 import com.oracle.bmc.objectstorage.responses.GetObjectResponse;
 import com.oracle.bmc.objectstorage.responses.ListObjectsResponse;
+import com.oracle.bmc.objectstorage.transfer.UploadConfiguration;
+import com.oracle.bmc.objectstorage.transfer.UploadManager;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.List;
 
@@ -36,7 +39,10 @@ public class OracleGetFIles {
             }
 
     public static void main(String[] args) throws IOException {
-        getObjectFromBucket(getOracleFile());;
+
+                getOracleFile();
+      // getObjectFromBucket(getOracleFile());;
+        saveFilesOnOCI();
     }
     public static List<ObjectSummary> getOracleFile() throws IOException {
 
@@ -101,9 +107,49 @@ public class OracleGetFIles {
 
     }
     public static void saveFilesOnOCI(){
+        File fileToUpload = new File("C:\\OracleBucketFilesTest\\upload\\uploadText.txt");
+        UploadConfiguration uploadConfiguration =
+                UploadConfiguration.builder()
+                        .allowMultipartUploads(true)
+                        .allowParallelUploads(true)
+                        .build();
 
-        PutObjectRequest 
+        UploadManager uploadManager = new UploadManager(client, uploadConfiguration);
+        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                .namespaceName("frfoypo4fiml")
+                .bucketName("bucket-test")
+                .objectName(fileToUpload.getName())
+                .build();
+
+
+
+        UploadManager.UploadRequest uploadDetails =
+                UploadManager.UploadRequest.builder(fileToUpload).allowOverwrite(true).build(putObjectRequest);
+        UploadManager.UploadResponse response = uploadManager.upload(uploadDetails);
+        System.out.println(response);
+
+
+
+        // fetch the object just uploaded
+        GetObjectResponse getResponse =
+                client.getObject(
+                        GetObjectRequest.builder()
+                                .namespaceName("frfoypo4fiml")
+                                .bucketName("bucket-test")
+                                .objectName(fileToUpload.getName())
+                                .build());
+
+        // use the response's function to print the fetched object's metadata
+        System.out.println(getResponse.getOpcMeta());
+
+        // stream contents should match the file uploaded
+        try (final InputStream fileStream = getResponse.getInputStream()) {
+            // use fileStream
+        } catch(Exception e) {// try-with-resources automatically closes fileStream
+
+        }
+    }
 
     }
 
-}
+
